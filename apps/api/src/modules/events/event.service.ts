@@ -42,3 +42,35 @@ export async function createEventService(data: CreateEventInput) {
     },
   });
 }
+
+export async function listEventsService() {
+  return prisma.event.findMany({
+    orderBy: {
+      dateTime: "asc",
+    },
+  });
+}
+
+export async function getEventByIdService(id: string) {
+  return prisma.event.findUnique({
+    where: {
+      id,
+    },
+  });
+}
+
+export async function getEventSeatsService(eventId: string) {
+  return prisma.eventSeat.findMany({
+    where: {
+      eventId,
+    },
+    orderBy: [
+      {
+        row: "asc",
+      },
+      {
+        number: "asc",
+      },
+    ],
+  });
+}
