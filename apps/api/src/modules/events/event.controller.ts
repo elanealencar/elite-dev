@@ -4,6 +4,8 @@ import {
   getEventByIdService,
   getEventSeatsService,
   listEventsService,
+  listOrganizerEventsService,
+  publishEventService,
 } from "./event.service.js";
 
 export async function createEvent(
@@ -122,6 +124,92 @@ export async function getEventSeats(
     const seats = await getEventSeatsService(id);
 
     return response.status(200).json(seats);
+  } catch (error) {
+    console.error(error);
+
+    return response.status(500).json({
+      message: "Internal server error",
+    });
+  }
+}
+
+export async function publishEvent(
+  request: Request,
+  response: Response
+) {
+  try {
+    const id = request.params.id;
+
+    if (typeof id !== "string") {
+      return response.status(400).json({
+        message: "Invalid event id",
+      });
+    }
+
+    if (!request.user) {
+      return response.status(401).json({
+        message: "Unauthorized",
+      });
+    }
+
+    const event = await publishEventService(
+      id,
+      request.user.id
+    );
+
+    return response.status(200).json(event);
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === "EVENT_NOT_FOUND"
+    ) {
+      return response.status(404).json({
+        message: "Event not found",
+      });
+    }
+
+    if (
+      error instanceof Error &&
+      error.message === "FORBIDDEN"
+    ) {
+      return response.status(403).json({
+        message: "Forbidden",
+      });
+    }
+
+    if (
+      error instanceof Error &&
+      error.message === "EVENT_CANCELLED"
+    ) {
+      return response.status(409).json({
+        message: "Cancelled event cannot be published",
+      });
+    }
+
+    console.error(error);
+
+    return response.status(500).json({
+      message: "Internal server error",
+    });
+  }
+}
+
+export async function listOrganizerEvents(
+  request: Request,
+  response: Response
+) {
+  try {
+    if (!request.user) {
+      return response.status(401).json({
+        message: "Unauthorized",
+      });
+    }
+
+    const events = await listOrganizerEventsService(
+      request.user.id
+    );
+
+    return response.status(200).json(events);
   } catch (error) {
     console.error(error);
 

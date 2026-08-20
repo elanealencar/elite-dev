@@ -45,6 +45,9 @@ export async function createEventService(data: CreateEventInput) {
 
 export async function listEventsService() {
   return prisma.event.findMany({
+    where: {
+      status: "PUBLISHED",
+    },
     orderBy: {
       dateTime: "asc",
     },
@@ -72,5 +75,50 @@ export async function getEventSeatsService(eventId: string) {
         number: "asc",
       },
     ],
+  });
+}
+
+export async function publishEventService(
+  eventId: string,
+  organizerId: string
+) {
+  const event = await prisma.event.findUnique({
+    where: {
+      id: eventId,
+    },
+  });
+
+  if (!event) {
+    throw new Error("EVENT_NOT_FOUND");
+  }
+
+  if (event.organizerId !== organizerId) {
+    throw new Error("FORBIDDEN");
+  }
+
+  if (event.status === "CANCELLED") {
+    throw new Error("EVENT_CANCELLED");
+  }
+
+  return prisma.event.update({
+    where: {
+      id: eventId,
+    },
+    data: {
+      status: "PUBLISHED",
+    },
+  });
+}
+
+export async function listOrganizerEventsService(
+  organizerId: string
+) {
+  return prisma.event.findMany({
+    where: {
+      organizerId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 }
