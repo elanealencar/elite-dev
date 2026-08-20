@@ -1,5 +1,6 @@
 import { prisma } from "../../database/prisma.js";
 import { getMovieByIdService } from "../catalog/catalog.service.js";
+import { expireReservationsService } from "../reservations/reservation.service.js";
 
 type CreateEventInput = {
   tmdbMovieId: number;
@@ -63,6 +64,8 @@ export async function getEventByIdService(id: string) {
 }
 
 export async function getEventSeatsService(eventId: string) {
+  await expireReservationsService(eventId);
+
   return prisma.eventSeat.findMany({
     where: {
       eventId,

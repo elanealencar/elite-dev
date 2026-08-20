@@ -10,6 +10,8 @@ type CreateReservationInput = {
 export async function createReservationService(
   data: CreateReservationInput
 ) {
+  await expireReservationsService(data.eventId);
+  
   const now = new Date();
 
   const expiresAt = new Date(
@@ -105,4 +107,76 @@ export async function createReservationService(
         Prisma.TransactionIsolationLevel.Serializable,
     }
   );
+}
+
+export async function expireReservationsService(
+  eventId?: string
+) {
+  const now = new Date();
+
+  const expiredReservations =
+    await prisma.reservation.findMany({
+      where: {
+        status: "PENDING_PAYMENT",
+        expiresAt: {
+          lte: now,
+        },
+
+        ...(eventId
+          ? {
+              eventId,
+            }
+          : {}),
+      },
+
+      include: {
+        seats: true,
+      },
+    });
+
+  if (expiredReservations.length === 0) {
+    return;
+  }
+
+  await prisma.$transaction(async (tx) => {
+    for (const reservation of expiredReservations) {
+      const reservationUpdated =
+        await tx.reservation.updateMany({
+          where: {
+            id: reservation.id,
+            status: "PENDING_PAYMENT",
+            expiresAt: {
+              lte: now,
+            },
+          },
+
+          data: {
+            status: "EXPIRED",
+          },
+        });
+
+      if (reservationUpdated.count === 0) {
+        continue;
+      }
+
+      const seatIds = reservation.seats.map(
+        (seat) => seat.eventSeatId
+      );
+
+      await tx.eventSeat.updateMany({
+        where: {
+          id: {
+            in: seatIds,
+          },
+
+          status: "HELD",
+        },
+
+        data: {
+          status: "AVAILABLE",
+          heldUntil: null,
+        },
+      });
+    }
+  });
 }
