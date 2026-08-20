@@ -1,9 +1,8 @@
 import { prisma } from "../../database/prisma.js";
+import { getMovieByIdService } from "../catalog/catalog.service.js";
 
 type CreateEventInput = {
   tmdbMovieId: number;
-  movieTitle: string;
-  moviePosterUrl?: string;
   dateTime: string;
   location: string;
   room: string;
@@ -12,6 +11,7 @@ type CreateEventInput = {
 };
 
 export async function createEventService(data: CreateEventInput) {
+  const movie = await getMovieByIdService(data.tmdbMovieId);
   const rows = ["A", "B", "C", "D", "E", "F"];
 
   const seats = rows.flatMap((row) =>
@@ -23,9 +23,9 @@ export async function createEventService(data: CreateEventInput) {
 
   return prisma.event.create({
     data: {
-      tmdbMovieId: data.tmdbMovieId,
-      movieTitle: data.movieTitle,
-      moviePosterUrl: data.moviePosterUrl,
+      tmdbMovieId: movie.id,
+      movieTitle: movie.title,
+      moviePosterUrl: movie.posterUrl,
       dateTime: new Date(data.dateTime),
       location: data.location,
       room: data.room,

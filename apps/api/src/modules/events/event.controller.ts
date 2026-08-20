@@ -24,6 +24,24 @@ export async function createEvent(
 
     return response.status(201).json(event);
   } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === "MOVIE_NOT_FOUND"
+    ) {
+      return response.status(404).json({
+        message: "Movie not found",
+      });
+    }
+
+    if (
+      error instanceof Error &&
+      error.message === "TMDB_REQUEST_FAILED"
+    ) {
+      return response.status(502).json({
+        message: "Failed to fetch movie from TMDb",
+      });
+    }
+
     console.error(error);
 
     return response.status(500).json({
