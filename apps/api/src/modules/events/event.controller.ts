@@ -6,9 +6,21 @@ import {
   listEventsService,
 } from "./event.service.js";
 
-export async function createEvent(request: Request, response: Response) {
+export async function createEvent(
+  request: Request,
+  response: Response
+) {
   try {
-    const event = await createEventService(request.body);
+    if (!request.user) {
+      return response.status(401).json({
+        message: "Unauthorized",
+      });
+    }
+
+    const event = await createEventService({
+      ...request.body,
+      organizerId: request.user.id,
+    });
 
     return response.status(201).json(event);
   } catch (error) {

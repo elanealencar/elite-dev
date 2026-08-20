@@ -2,12 +2,14 @@ import cors from "cors";
 import express from "express";
 import { prisma } from "./database/prisma.js";
 import { eventRoutes } from "./modules/events/event.routes.js";
+import { authRoutes } from "./modules/auth/auth.routes.js";
 
 export const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use("/events", eventRoutes);
+app.use("/auth", authRoutes);
 
 app.get("/health/db", async (_request, response) => {
   try {
