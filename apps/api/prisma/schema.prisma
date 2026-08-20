@@ -20,6 +20,11 @@ enum ReservationStatus {
   CANCELLED
 }
 
+enum PaymentStatus {
+  APPROVED
+  DECLINED
+}
+
 model User {
   id           String @id @default(uuid())
   name         String
@@ -99,6 +104,7 @@ model Reservation {
   totalAmount Decimal           @db.Decimal(10, 2)
 
   seats ReservationSeat[]
+  payment Payment?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -118,4 +124,16 @@ model ReservationSeat {
   createdAt DateTime @default(now())
 
   @@unique([reservationId, eventSeatId])
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+
+  reservationId String        @unique
+  reservation   Reservation   @relation(fields: [reservationId], references: [id])
+
+  amount        Decimal       @db.Decimal(10, 2)
+  status        PaymentStatus
+
+  createdAt     DateTime      @default(now())
 }
