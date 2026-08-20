@@ -12,15 +12,26 @@ enum Role {
   GATE
 }
 
+enum ReservationStatus {
+  PENDING_PAYMENT
+  PAID
+  PAYMENT_FAILED
+  EXPIRED
+  CANCELLED
+}
+
 model User {
-  id           String   @id @default(uuid())
+  id           String @id @default(uuid())
   name         String
-  email        String   @unique
+  email        String @unique
   passwordHash String
   role         Role
+
   events       Event[]
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  reservations Reservation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum EventStatus {
@@ -36,37 +47,75 @@ enum SeatStatus {
 }
 
 model Event {
-  id              String      @id @default(uuid())
-  tmdbMovieId     Int
-  movieTitle      String
-  moviePosterUrl  String?
-  dateTime        DateTime
-  location        String
-  room            String
-  price           Decimal     @db.Decimal(10, 2)
-  capacity        Int         @default(48)
-  status          EventStatus @default(DRAFT)
+  id             String      @id @default(uuid())
+  tmdbMovieId    Int
+  movieTitle     String
+  moviePosterUrl String?
+  dateTime       DateTime
+  location       String
+  room           String
+  price          Decimal     @db.Decimal(10, 2)
+  capacity       Int         @default(48)
+  status         EventStatus @default(DRAFT)
 
-  organizerId     String
-  organizer       User        @relation(fields: [organizerId], references: [id])
+  organizerId String
+  organizer   User   @relation(fields: [organizerId], references: [id])
 
-  seats           EventSeat[]
+  seats        EventSeat[]
+  reservations Reservation[]
 
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model EventSeat {
-  id        String     @id @default(uuid())
-  eventId   String
-  event     Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  id      String @id @default(uuid())
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   row       String
   number    Int
   status    SeatStatus @default(AVAILABLE)
   heldUntil DateTime?
 
-  createdAt DateTime   @default(now())
+  reservationSeats ReservationSeat[]
+
+  createdAt DateTime @default(now())
 
   @@unique([eventId, row, number])
+}
+
+model Reservation {
+  id String @id @default(uuid())
+
+  customerId String
+  customer   User   @relation(fields: [customerId], references: [id])
+
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id])
+
+  status      ReservationStatus @default(PENDING_PAYMENT)
+  expiresAt   DateTime
+  totalAmount Decimal           @db.Decimal(10, 2)
+
+  seats ReservationSeat[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ReservationSeat {
+  id String @id @default(uuid())
+
+  reservationId String
+  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+
+  eventSeatId String
+  eventSeat   EventSeat @relation(fields: [eventSeatId], references: [id])
+
+  price Decimal @db.Decimal(10, 2)
+
+  createdAt DateTime @default(now())
+
+  @@unique([reservationId, eventSeatId])
 }
