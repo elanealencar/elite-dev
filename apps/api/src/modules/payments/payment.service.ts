@@ -1,5 +1,9 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../../database/prisma.js";
+import {
+  generateShareToken,
+  generateTicketCode,
+} from "../tickets/ticket.service.js";
 
 type PaymentResult = "APPROVED" | "DECLINED";
 
@@ -155,9 +159,25 @@ export async function processPaymentService(
         },
       });
 
+      const tickets = [];
+
+      for (const reservationSeat of reservation.seats) {
+        const ticket = await tx.ticket.create({
+          data: {
+            reservationId: reservation.id,
+            reservationSeatId: reservationSeat.id,
+            code: generateTicketCode(),
+            shareToken: generateShareToken(),
+          },
+        });
+
+        tickets.push(ticket);
+      }
+
       return {
         payment,
         reservationStatus: "PAID",
+        tickets,
       };
     },
     {

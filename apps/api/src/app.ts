@@ -5,6 +5,7 @@ import { eventRoutes } from "./modules/events/event.routes.js";
 import { authRoutes } from "./modules/auth/auth.routes.js";
 import { catalogRoutes } from "./modules/catalog/catalog.routes.js";
 import { reservationRoutes } from "./modules/reservations/reservation.routes.js";
+import { ticketRoutes } from "./modules/tickets/ticket.routes.js";
 
 export const app = express();
 
@@ -14,6 +15,7 @@ app.use("/events", eventRoutes);
 app.use("/auth", authRoutes);
 app.use("/catalog", catalogRoutes);
 app.use("/reservations", reservationRoutes);
+app.use("/tickets", ticketRoutes);
 
 app.get("/health/db", async (_request, response) => {
   try {
