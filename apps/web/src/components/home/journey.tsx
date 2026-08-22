@@ -58,25 +58,9 @@ export function Journey() {
   return (
     <section className="border-b border-(--border)">
       <Container className="py-20 md:py-28">
-        <div className="grid gap-16 lg:grid-cols-[0.45fr_1fr]">
-          <div className="flex flex-col justify-between">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-[0.18em] text-(--muted)">
-                Sua experiência
-              </p>
-
-              <p className="mt-4 max-w-xs text-sm leading-6 text-(--muted)">
-                Do primeiro clique até a entrada na sala.
-              </p>
-            </div>
-
-            <div className="mt-12 hidden lg:block">
-              <span
-                className="block h-3 w-3 transition-colors duration-500"
-                style={{ backgroundColor: active.color }}
-              />
-            </div>
-          </div>
+        <div className="gap-16 lg:grid-cols-[0.45fr_1fr]">
+         
+          
 
           <div>
             <div className="flex items-start justify-between border-b border-(--border) pb-8">
