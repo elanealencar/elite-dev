@@ -13,3 +13,21 @@ export async function getEvents(): Promise<Event[]> {
 
   return response.json();
 }
+
+export async function getEventById(
+  id: string
+): Promise<Event | null> {
+  const response = await fetch(`${API_URL}/events/${id}`, {
+    cache: "no-store",
+  });
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  if (!response.ok) {
+    throw new Error("Não foi possível carregar o evento");
+  }
+
+  return response.json();
+}
