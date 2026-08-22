@@ -5,35 +5,35 @@ import { Container } from "./container";
 
 export function Header() {
   return (
-    <header className="border-b border-(--border)">
+    <header className="border-b border-(--border) bg-[#151515]">
       <Container>
         <div className="flex h-20 items-center justify-between">
           <Link
             href="/"
             className="text-xl font-semibold tracking-[-0.04em]"
           >
-            ELITE<span className="text-(--accent-dark)">•</span>
+            ELITE TICKETS   <span className="text-(--accent-green) text-2xl">•</span>
           </Link>
 
           <nav className="hidden items-center gap-8 text-sm font-medium md:flex">
             <Link
               href="/"
-              className="transition-opacity hover:opacity-50"
+              className="hover:text-(--accent-green)"
             >
-              Filmes
+              FILMES
             </Link>
 
             <Link
               href="/meus-ingressos"
-              className="transition-opacity hover:opacity-50"
+              className="hover:text-(--accent-green)"
             >
-              Meus ingressos
+              MEUS INGRESSOS
             </Link>
           </nav>
 
           <Link
             href="/login"
-            className="group flex items-center gap-2 border-b border-black pb-1 text-sm font-medium"
+            className="group flex items-center gap-2 pb-1 text-sm font-medium transition-colors hover:border-(--accent-green) hover:text-(--accent-green) border-2 border-white rounded-3xl px-6 py-2"
           >
             Entrar
 

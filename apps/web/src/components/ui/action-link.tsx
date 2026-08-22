@@ -18,15 +18,14 @@ export function ActionLink({
         inline-flex
         items-center
         gap-5
-        bg-(--foreground)
+        bg-(--accent-green)
         px-6
         py-4
         text-sm
         font-medium
-        text-(--background)
+        text-[#111111]
         transition-colors
-        hover:bg-(--accent)
-        hover:text-(--foreground)
+        hover:bg-[#f4f4ee]
       "
     >
       {children}
