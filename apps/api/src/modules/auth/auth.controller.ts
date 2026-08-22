@@ -3,6 +3,12 @@ import {
   loginService,
   registerService,
 } from "./auth.service.js";
+import { z } from "zod";
+
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+});
 
 export async function register(
   request: Request,
@@ -35,7 +41,15 @@ export async function login(
   response: Response
 ) {
   try {
-    const { email, password } = request.body;
+    const parsed = loginSchema.safeParse(request.body);
+
+    if (!parsed.success) {
+      return response.status(400).json({
+        message: "Invalid login data",
+      });
+    }
+
+    const { email, password } = parsed.data;
 
     const result = await loginService(email, password);
 

@@ -15,7 +15,7 @@ export function authenticate(
 
   if (!authHeader) {
     return response.status(401).json({
-      message: "Unauthorized",
+      message: "Não autorizado",
     });
   }
 
@@ -23,7 +23,7 @@ export function authenticate(
 
   if (!token) {
     return response.status(401).json({
-      message: "Unauthorized",
+      message: "Não autorizado",
     });
   }
 

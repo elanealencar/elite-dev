@@ -7,6 +7,15 @@ import {
   listOrganizerEventsService,
   publishEventService,
 } from "./event.service.js";
+import { z } from "zod";
+
+const createEventSchema = z.object({
+  tmdbMovieId: z.number().int().positive(),
+  dateTime: z.string().datetime(),
+  location: z.string().min(1),
+  room: z.string().min(1),
+  price: z.number().positive(),
+});
 
 export async function createEvent(
   request: Request,
@@ -15,12 +24,20 @@ export async function createEvent(
   try {
     if (!request.user) {
       return response.status(401).json({
-        message: "Unauthorized",
+        message: "Não autorizado",
+      });
+    }
+
+    const parsed = createEventSchema.safeParse(request.body);
+
+    if (!parsed.success) {
+      return response.status(400).json({
+        message: "Invalid event data",
       });
     }
 
     const event = await createEventService({
-      ...request.body,
+      ...parsed.data,
       organizerId: request.user.id,
     });
 
@@ -148,7 +165,7 @@ export async function publishEvent(
 
     if (!request.user) {
       return response.status(401).json({
-        message: "Unauthorized",
+        message: "Não autorizado",
       });
     }
 
@@ -201,7 +218,7 @@ export async function listOrganizerEvents(
   try {
     if (!request.user) {
       return response.status(401).json({
-        message: "Unauthorized",
+        message: "Não autorizado",
       });
     }
 
