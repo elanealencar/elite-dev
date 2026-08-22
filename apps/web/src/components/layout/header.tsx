@@ -1,9 +1,18 @@
+"use client";
+
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, LogOut } from "lucide-react";
+import { useAuth } from "@/components/providers/auth-provider";
 
 import { Container } from "./container";
 
 export function Header() {
+  const {
+  user,
+  logout,
+  loading,
+} = useAuth();
+
   return (
     <header className="border-b border-(--border) bg-[#151515]">
       <Container>
@@ -31,17 +40,37 @@ export function Header() {
             </Link>
           </nav>
 
-          <Link
-            href="/login"
-            className="group flex items-center gap-2 pb-1 text-sm font-medium transition-colors hover:border-(--accent-green) hover:text-(--accent-green) border-2 border-white rounded-3xl px-6 py-2"
-          >
-            Entrar
+          {!loading && (
+            user ? (
+              <div className="flex items-center gap-5">
+                <span className="hidden text-md text-(--muted) sm:block">
+                  {user.name}
+                </span>
 
-            <ArrowUpRight
-              size={16}
-              className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-            />
-          </Link>
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="group flex items-center gap-2 border-b border-(--foreground) pb-1 text-sm font-medium transition-colors hover:border-(--accent-green) hover:text-(--accent-green)"
+                >
+                  Sair
+
+                  <LogOut size={14} />
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="group flex items-center gap-2 border-b border-(--foreground) pb-1 text-sm font-medium transition-colors hover:border-(--accent-green) hover:text-(--accent-green)"
+              >
+                Entrar
+
+                <ArrowUpRight
+                  size={16}
+                  className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                />
+              </Link>
+            )
+          )}
         </div>
       </Container>
     </header>

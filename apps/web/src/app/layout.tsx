@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
+import { AuthProvider } from "@/components/providers/auth-provider";
 
 import "./globals.css";
 
@@ -21,7 +22,9 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={spaceGrotesk.variable}>
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
