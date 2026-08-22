@@ -31,7 +31,7 @@ export async function register(
     console.error(error);
 
     return response.status(500).json({
-      message: "Internal server error",
+      message: "Erro interno do servidor",
     });
   }
 }
@@ -45,7 +45,7 @@ export async function login(
 
     if (!parsed.success) {
       return response.status(400).json({
-        message: "Invalid login data",
+        message: "Dados de login inválidos",
       });
     }
 
@@ -60,14 +60,14 @@ export async function login(
       error.message === "INVALID_CREDENTIALS"
     ) {
       return response.status(401).json({
-        message: "Invalid credentials",
+        message: "E-mail ou senha inválidos",
       });
     }
 
     console.error(error);
 
     return response.status(500).json({
-      message: "Internal server error",
+      message: "Erro interno do servidor",
     });
   }
 }

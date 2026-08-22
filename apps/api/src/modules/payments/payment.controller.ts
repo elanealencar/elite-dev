@@ -8,7 +8,7 @@ export async function processPayment(
   try {
     if (!request.user) {
       return response.status(401).json({
-        message: "Unauthorized",
+        message: "Não autorizado",
       });
     }
 
@@ -27,7 +27,7 @@ export async function processPayment(
     ) {
       return response.status(400).json({
         message:
-          "Payment result must be APPROVED or DECLINED",
+          "O resultado do pagamento deve ser APPROVED ou DECLINED",
       });
     }
 
@@ -44,7 +44,7 @@ export async function processPayment(
       error.message === "RESERVATION_NOT_FOUND"
     ) {
       return response.status(404).json({
-        message: "Reservation not found",
+        message: "Reserva não encontrada",
       });
     }
 
@@ -53,7 +53,7 @@ export async function processPayment(
       error.message === "FORBIDDEN"
     ) {
       return response.status(403).json({
-        message: "Forbidden",
+        message: "Você não tem permissão para realizar esta ação",
       });
     }
 
@@ -62,7 +62,7 @@ export async function processPayment(
       error.message === "RESERVATION_EXPIRED"
     ) {
       return response.status(409).json({
-        message: "Reservation has expired",
+        message: "A reserva expirou",
       });
     }
 
@@ -71,7 +71,7 @@ export async function processPayment(
       error.message === "PAYMENT_ALREADY_PROCESSED"
     ) {
       return response.status(409).json({
-        message: "Payment has already been processed",
+        message: "O pagamento desta reserva já foi processado",
       });
     }
 
@@ -80,7 +80,7 @@ export async function processPayment(
       error.message === "RESERVATION_NOT_PAYABLE"
     ) {
       return response.status(409).json({
-        message: "Reservation cannot be paid",
+        message: "Esta reserva não pode ser paga",
       });
     }
 
@@ -89,14 +89,14 @@ export async function processPayment(
       error.message === "SEATS_NOT_HELD"
     ) {
       return response.status(409).json({
-        message: "Reservation seats are no longer held",
+        message: "Os assentos desta reserva não estão mais reservados",
       });
     }
 
     console.error(error);
 
     return response.status(500).json({
-      message: "Internal server error",
+      message: "Erro interno do servidor",
     });
   }
 }

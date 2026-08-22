@@ -30,7 +30,7 @@ export async function searchMovies(
     }
 
     return response.status(500).json({
-      message: "Internal server error",
+      message: "Erro interno do servidor",
     });
   }
 }

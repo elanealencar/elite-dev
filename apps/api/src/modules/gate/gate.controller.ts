@@ -8,7 +8,7 @@ export async function validateTicket(
   try {
     if (!request.user) {
       return response.status(401).json({
-        message: "Unauthorized",
+        message: "Não autorizado",
       });
     }
 
@@ -16,19 +16,19 @@ export async function validateTicket(
 
     if (typeof eventId !== "string") {
       return response.status(400).json({
-        message: "Event id is required",
+        message: "O ID do evento é obrigatório",
       });
     }
 
     if (!qrToken && !code) {
       return response.status(400).json({
-        message: "QR token or ticket code is required",
+        message: "Informe o QR Code ou o código do ingresso",
       });
     }
 
     if (qrToken && code) {
       return response.status(400).json({
-        message: "Provide either QR token or ticket code",
+        message: "Informe apenas um dos campos: QR Code ou código do ingresso",
       });
     }
 
@@ -50,7 +50,7 @@ export async function validateTicket(
     console.error(error);
 
     return response.status(500).json({
-      message: "Internal server error",
+      message: "Erro interno do servidor",
     });
   }
 }

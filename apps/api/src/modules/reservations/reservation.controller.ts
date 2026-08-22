@@ -8,7 +8,7 @@ export async function createReservation(
   try {
     if (!request.user) {
       return response.status(401).json({
-        message: "Unauthorized",
+        message: "Não autorizado",
       });
     }
 
@@ -21,7 +21,7 @@ export async function createReservation(
       !seatIds.every((seatId) => typeof seatId === "string")
     ) {
       return response.status(400).json({
-        message: "Invalid reservation data",
+        message: "Dados da reserva inválidos",
       });
     }
 
@@ -29,7 +29,7 @@ export async function createReservation(
 
     if (uniqueSeatIds.length !== seatIds.length) {
       return response.status(400).json({
-        message: "Duplicate seats are not allowed",
+        message: "Não é permitido selecionar assentos duplicados",
       });
     }
 
@@ -46,7 +46,7 @@ export async function createReservation(
       error.message === "EVENT_NOT_FOUND"
     ) {
       return response.status(404).json({
-        message: "Event not found",
+        message: "Evento não encontrado",
       });
     }
 
@@ -55,7 +55,7 @@ export async function createReservation(
       error.message === "EVENT_NOT_AVAILABLE"
     ) {
       return response.status(409).json({
-        message: "Event is not available for reservations",
+        message: "Este evento não está disponível para reservas",
       });
     }
 
@@ -64,7 +64,7 @@ export async function createReservation(
       error.message === "EVENT_ALREADY_STARTED"
     ) {
       return response.status(409).json({
-        message: "Event has already started",
+        message: "Este evento já começou",
       });
     }
 
@@ -73,7 +73,7 @@ export async function createReservation(
       error.message === "INVALID_SEATS"
     ) {
       return response.status(400).json({
-        message: "One or more seats do not belong to this event",
+        message: "Um ou mais assentos não pertencem a este evento",
       });
     }
 
@@ -82,14 +82,14 @@ export async function createReservation(
       error.message === "SEATS_UNAVAILABLE"
     ) {
       return response.status(409).json({
-        message: "One or more seats are no longer available",
+        message: "Um ou mais assentos não estão mais disponíveis",
       });
     }
 
     console.error(error);
 
     return response.status(500).json({
-      message: "Internal server error",
+      message: "Erro interno do servidor",
     });
   }
 }

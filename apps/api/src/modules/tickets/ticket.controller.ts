@@ -8,7 +8,7 @@ export async function listCustomerTickets(
   try {
     if (!request.user) {
       return response.status(401).json({
-        message: "Unauthorized",
+        message: "Não autorizado",
       });
     }
 
@@ -20,7 +20,7 @@ export async function listCustomerTickets(
     console.error(error);
 
     return response.status(500).json({
-      message: "Internal server error",
+      message: "Erro interno do servidor",
     });
   }
 }
@@ -32,7 +32,7 @@ export async function getTicketQrCode(
   try {
     if (!request.user) {
       return response.status(401).json({
-        message: "Unauthorized",
+        message: "Não autorizado",
       });
     }
 
@@ -40,7 +40,7 @@ export async function getTicketQrCode(
 
     if (typeof ticketId !== "string") {
       return response.status(400).json({
-        message: "Invalid ticket id",
+        message: "ID do ingresso inválido",
       });
     }
 
@@ -56,7 +56,7 @@ export async function getTicketQrCode(
       error.message === "TICKET_NOT_FOUND"
     ) {
       return response.status(404).json({
-        message: "Ticket not found",
+        message: "Ingresso não encontrado",
       });
     }
 
@@ -65,14 +65,14 @@ export async function getTicketQrCode(
       error.message === "FORBIDDEN"
     ) {
       return response.status(403).json({
-        message: "Forbidden",
+        message: "Você não tem permissão para realizar esta ação",
       });
     }
 
     console.error(error);
 
     return response.status(500).json({
-      message: "Internal server error",
+      message: "Erro interno do servidor",
     });
   }
 }
@@ -86,7 +86,7 @@ export async function getSharedTicket(
 
     if (typeof token !== "string") {
       return response.status(400).json({
-        message: "Invalid share token",
+        message: "Token de compartilhamento inválido",
       });
     }
 
@@ -99,14 +99,14 @@ export async function getSharedTicket(
       error.message === "TICKET_NOT_FOUND"
     ) {
       return response.status(404).json({
-        message: "Ticket not found",
+        message: "Ingresso não encontrado",
       });
     }
 
     console.error(error);
 
     return response.status(500).json({
-      message: "Internal server error",
+      message: "Erro interno do servidor",
     });
   }
 }

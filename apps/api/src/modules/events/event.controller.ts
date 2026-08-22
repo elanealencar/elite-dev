@@ -32,7 +32,7 @@ export async function createEvent(
 
     if (!parsed.success) {
       return response.status(400).json({
-        message: "Invalid event data",
+        message: "Dados do evento inválidos",
       });
     }
 
@@ -48,7 +48,7 @@ export async function createEvent(
       error.message === "MOVIE_NOT_FOUND"
     ) {
       return response.status(404).json({
-        message: "Movie not found",
+        message: " Filme não encontrado",
       });
     }
 
@@ -57,14 +57,14 @@ export async function createEvent(
       error.message === "TMDB_REQUEST_FAILED"
     ) {
       return response.status(502).json({
-        message: "Failed to fetch movie from TMDb",
+        message: "Não foi possível consultar o filme na TMDb",
       });
     }
 
     console.error(error);
 
     return response.status(500).json({
-      message: "Internal server error",
+      message: "Erro interno do servidor",
     });
   }
 }
@@ -81,7 +81,7 @@ export async function listEvents(
     console.error(error);
 
     return response.status(500).json({
-      message: "Internal server error",
+      message: "Erro interno do servidor",
     });
   }
 }
@@ -95,7 +95,7 @@ export async function getEventById(
 
     if (typeof id !== "string") {
       return response.status(400).json({
-        message: "Invalid event id",
+        message: "ID do evento inválido",
       });
     }
 
@@ -103,7 +103,7 @@ export async function getEventById(
 
     if (!event) {
       return response.status(404).json({
-        message: "Event not found",
+        message: "Evento não encontrado",
       });
     }
 
@@ -112,7 +112,7 @@ export async function getEventById(
     console.error(error);
 
     return response.status(500).json({
-      message: "Internal server error",
+      message: "Erro interno do servidor",
     });
   }
 }
@@ -126,7 +126,7 @@ export async function getEventSeats(
 
     if (typeof id !== "string") {
       return response.status(400).json({
-        message: "Invalid event id",
+        message: "ID do evento inválido",
       });
     }
 
@@ -134,7 +134,7 @@ export async function getEventSeats(
 
     if (!event) {
       return response.status(404).json({
-        message: "Event not found",
+        message: "Evento não encontrado",
       });
     }
 
@@ -145,7 +145,7 @@ export async function getEventSeats(
     console.error(error);
 
     return response.status(500).json({
-      message: "Internal server error",
+      message: "Erro interno do servidor",
     });
   }
 }
@@ -159,7 +159,7 @@ export async function publishEvent(
 
     if (typeof id !== "string") {
       return response.status(400).json({
-        message: "Invalid event id",
+        message: "ID do evento inválido",
       });
     }
 
@@ -181,7 +181,7 @@ export async function publishEvent(
       error.message === "EVENT_NOT_FOUND"
     ) {
       return response.status(404).json({
-        message: "Event not found",
+        message: "Evento não encontrado",
       });
     }
 
@@ -190,7 +190,7 @@ export async function publishEvent(
       error.message === "FORBIDDEN"
     ) {
       return response.status(403).json({
-        message: "Forbidden",
+        message: "Você não tem permissão para realizar esta ação",
       });
     }
 
@@ -199,14 +199,14 @@ export async function publishEvent(
       error.message === "EVENT_CANCELLED"
     ) {
       return response.status(409).json({
-        message: "Cancelled event cannot be published",
+        message: "Um evento cancelado não pode ser publicado",
       });
     }
 
     console.error(error);
 
     return response.status(500).json({
-      message: "Internal server error",
+      message: "Erro interno do servidor",
     });
   }
 }
@@ -231,7 +231,7 @@ export async function listOrganizerEvents(
     console.error(error);
 
     return response.status(500).json({
-      message: "Internal server error",
+      message: "Erro interno do servidor",
     });
   }
 }
