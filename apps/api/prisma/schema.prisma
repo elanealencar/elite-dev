@@ -31,6 +31,13 @@ enum TicketStatus {
   CANCELLED
 }
 
+enum TicketValidationResult {
+  VALID
+  INVALID
+  ALREADY_USED
+  WRONG_EVENT
+}
+
 model User {
   id           String @id @default(uuid())
   name         String
@@ -40,6 +47,8 @@ model User {
 
   events       Event[]
   reservations Reservation[]
+
+  ticketValidations TicketValidation[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -162,6 +171,24 @@ model Ticket {
   status            TicketStatus @default(VALID)
   usedAt            DateTime?
 
+  validations       TicketValidation[]
+
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
+}
+
+model TicketValidation {
+  id         String                 @id @default(uuid())
+
+  ticketId   String?
+  ticket     Ticket?                @relation(fields: [ticketId], references: [id])
+
+  eventId    String
+
+  gateUserId String
+  gateUser   User                   @relation(fields: [gateUserId], references: [id])
+
+  result     TicketValidationResult
+
+  createdAt  DateTime               @default(now())
 }
