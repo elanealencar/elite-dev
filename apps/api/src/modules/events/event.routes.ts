@@ -6,6 +6,8 @@ import {
   listEvents,
   listOrganizerEvents,
   publishEvent,
+  cancelEvent,
+  deleteEvent,
 } from "./event.controller.js";
 
 import { authenticate } from "../../middlewares/authenticate.js";
@@ -38,4 +40,18 @@ eventRoutes.post(
   authenticate,
   authorizeRole("ORGANIZER"),
   createEvent
+);
+
+eventRoutes.delete(
+  "/:id",
+  authenticate,
+  authorizeRole("ORGANIZER"),
+  deleteEvent
+);
+
+eventRoutes.patch(
+  "/:id/cancel",
+  authenticate,
+  authorizeRole("ORGANIZER"),
+  cancelEvent
 );

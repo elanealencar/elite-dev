@@ -125,3 +125,64 @@ export async function listOrganizerEventsService(
     },
   });
 }
+
+export async function deleteEventService(
+  eventId: string,
+  organizerId: string
+) {
+  const event = await prisma.event.findUnique({
+    where: {
+      id: eventId,
+    },
+  });
+
+  if (!event) {
+    throw new Error("EVENT_NOT_FOUND");
+  }
+
+  if (event.organizerId !== organizerId) {
+    throw new Error("FORBIDDEN");
+  }
+
+  if (event.status !== "DRAFT") {
+    throw new Error("EVENT_NOT_DELETABLE");
+  }
+
+  await prisma.event.delete({
+    where: {
+      id: eventId,
+    },
+  });
+}
+
+export async function cancelEventService(
+  eventId: string,
+  organizerId: string
+) {
+  const event = await prisma.event.findUnique({
+    where: {
+      id: eventId,
+    },
+  });
+
+  if (!event) {
+    throw new Error("EVENT_NOT_FOUND");
+  }
+
+  if (event.organizerId !== organizerId) {
+    throw new Error("FORBIDDEN");
+  }
+
+  if (event.status !== "PUBLISHED") {
+    throw new Error("EVENT_NOT_CANCELLABLE");
+  }
+
+  return prisma.event.update({
+    where: {
+      id: eventId,
+    },
+    data: {
+      status: "CANCELLED",
+    },
+  });
+}

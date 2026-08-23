@@ -6,6 +6,8 @@ import {
   listEventsService,
   listOrganizerEventsService,
   publishEventService,
+  cancelEventService,
+  deleteEventService,
 } from "./event.service.js";
 import { z } from "zod";
 
@@ -228,6 +230,132 @@ export async function listOrganizerEvents(
 
     return response.status(200).json(events);
   } catch (error) {
+    console.error(error);
+
+    return response.status(500).json({
+      message: "Erro interno do servidor",
+    });
+  }
+}
+
+export async function deleteEvent(
+  request: Request,
+  response: Response
+) {
+  try {
+    const id = request.params.id;
+
+    if (typeof id !== "string") {
+      return response.status(400).json({
+        message: "ID do evento inválido",
+      });
+    }
+
+    if (!request.user) {
+      return response.status(401).json({
+        message: "Não autorizado",
+      });
+    }
+
+    await deleteEventService(
+      id,
+      request.user.id
+    );
+
+    return response.status(204).send();
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === "EVENT_NOT_FOUND"
+    ) {
+      return response.status(404).json({
+        message: "Evento não encontrado",
+      });
+    }
+
+    if (
+      error instanceof Error &&
+      error.message === "FORBIDDEN"
+    ) {
+      return response.status(403).json({
+        message:
+          "Você não tem permissão para realizar esta ação",
+      });
+    }
+
+    if (
+      error instanceof Error &&
+      error.message === "EVENT_NOT_DELETABLE"
+    ) {
+      return response.status(409).json({
+        message:
+          "Apenas eventos em rascunho podem ser excluídos",
+      });
+    }
+
+    console.error(error);
+
+    return response.status(500).json({
+      message: "Erro interno do servidor",
+    });
+  }
+}
+
+export async function cancelEvent(
+  request: Request,
+  response: Response
+) {
+  try {
+    const id = request.params.id;
+
+    if (typeof id !== "string") {
+      return response.status(400).json({
+        message: "ID do evento inválido",
+      });
+    }
+
+    if (!request.user) {
+      return response.status(401).json({
+        message: "Não autorizado",
+      });
+    }
+
+    const event = await cancelEventService(
+      id,
+      request.user.id
+    );
+
+    return response.status(200).json(event);
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === "EVENT_NOT_FOUND"
+    ) {
+      return response.status(404).json({
+        message: "Evento não encontrado",
+      });
+    }
+
+    if (
+      error instanceof Error &&
+      error.message === "FORBIDDEN"
+    ) {
+      return response.status(403).json({
+        message:
+          "Você não tem permissão para realizar esta ação",
+      });
+    }
+
+    if (
+      error instanceof Error &&
+      error.message === "EVENT_NOT_CANCELLABLE"
+    ) {
+      return response.status(409).json({
+        message:
+          "Apenas eventos publicados podem ser cancelados",
+      });
+    }
+
     console.error(error);
 
     return response.status(500).json({
