@@ -1,12 +1,17 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Container } from "@/components/layout/container";
 import { formatCurrency } from "@/lib/format";
 import type { Event } from "@/types/event";
 import type { EventSeat } from "@/types/seat";
 import { Armchair } from "lucide-react";
+
+import { useRouter } from "next/navigation";
+
+import { useAuth } from "@/components/providers/auth-provider";
+import { createReservation } from "@/services/reservations";
 
 type SeatSelectionProps = {
   event: Event;
@@ -20,6 +25,122 @@ export function SeatSelection({
   const [selectedSeats, setSelectedSeats] = useState<string[]>(
     []
   );
+
+  const router = useRouter();
+
+  const {
+    user,
+    token,
+    loading: authLoading,
+  } = useAuth();
+
+  const [reservationLoading, setReservationLoading] =
+    useState(false);
+
+  const [reservationError, setReservationError] =
+    useState("");
+
+    useEffect(() => {
+    const saved = sessionStorage.getItem(
+      "elite_pending_reservation"
+    );
+
+    if (!saved) {
+      return;
+    }
+
+    try {
+      const pending = JSON.parse(saved) as {
+        eventId: string;
+        seatIds: string[];
+      };
+
+      if (pending.eventId === event.id) {
+        const availableIds = pending.seatIds.filter(
+          (seatId) =>
+            seats.some(
+              (seat) =>
+                seat.id === seatId &&
+                seat.status === "AVAILABLE"
+            )
+        );
+
+        setSelectedSeats(availableIds);
+      }
+    } catch {
+      sessionStorage.removeItem(
+        "elite_pending_reservation"
+      );
+    }
+  }, [event.id, seats]);
+
+  async function handleContinue() {
+    if (selectedSeats.length === 0) {
+      return;
+    }
+
+    setReservationError("");
+
+    if (authLoading) {
+      return;
+    }
+
+    if (!user || !token) {
+      sessionStorage.setItem(
+        "elite_pending_reservation",
+        JSON.stringify({
+          eventId: event.id,
+          seatIds: selectedSeats,
+        })
+      );
+
+      router.push(
+        `/login?redirect=${encodeURIComponent(
+          `/eventos/${event.id}`
+        )}`
+      );
+
+      return;
+    }
+
+    if (user.role !== "CUSTOMER") {
+      setReservationError(
+        "Somente clientes podem realizar reservas."
+      );
+      return;
+    }
+
+    try {
+      setReservationLoading(true);
+
+      const reservation = await createReservation({
+        eventId: event.id,
+        seatIds: selectedSeats,
+        token,
+      });
+
+      sessionStorage.removeItem(
+        "elite_pending_reservation"
+      );
+
+      sessionStorage.setItem(
+        "elite_current_reservation",
+        JSON.stringify(reservation)
+      );
+
+      router.push(
+        `/checkout/${reservation.id}`
+      );
+    } catch (error) {
+      setReservationError(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível criar a reserva"
+      );
+    } finally {
+      setReservationLoading(false);
+    }
+  }  
 
   function toggleSeat(seat: EventSeat) {
     if (seat.status !== "AVAILABLE") {
@@ -201,6 +322,9 @@ export function SeatSelection({
             event={event}
             selectedSeats={selectedSeatObjects}
             total={total}
+            loading={reservationLoading}
+            error={reservationError}
+            onContinue={handleContinue}
           />
         </div>
       </Container>
@@ -240,12 +364,18 @@ type SelectionSummaryProps = {
   event: Event;
   selectedSeats: EventSeat[];
   total: number;
+  loading: boolean;
+  error: string;
+  onContinue: () => void;
 };
 
 function SelectionSummary({
   event,
   selectedSeats,
   total,
+  loading,
+  error,
+  onContinue,
 }: SelectionSummaryProps) {
   return (
     <aside className="h-fit border border-(--border) bg-(--surface) p-6 lg:sticky lg:top-8">
@@ -298,7 +428,11 @@ function SelectionSummary({
 
       <button
         type="button"
-        disabled={selectedSeats.length === 0}
+        disabled={
+          selectedSeats.length === 0 ||
+          loading
+        }
+        onClick={onContinue}
         className="
           w-full
           bg-(--accent-green)
@@ -313,8 +447,16 @@ function SelectionSummary({
           disabled:opacity-30
         "
       >
-        Continuar
+        {loading
+          ? "Reservando..."
+          : "Continuar"}
       </button>
+
+      {error && (
+        <p className="mt-4 text-sm text-(--error)">
+          {error}
+        </p>
+      )}
 
       <p className="mt-4 text-xs leading-5 text-(--muted)">
         Os lugares serão reservados por 10 minutos após
