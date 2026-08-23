@@ -25,6 +25,8 @@ import type {
   GateValidationResult,
 } from "@/types/gate";
 
+import { QrScanner } from "@/components/gate/qr-scanner";
+
 export default function GatePage() {
   const router = useRouter();
 
@@ -53,6 +55,8 @@ export default function GatePage() {
     useState<GateValidationResponse | null>(
       null
     );
+
+  const [scannerOpen, setScannerOpen] = useState(false);
 
   useEffect(() => {
     if (authLoading) {
@@ -156,9 +160,9 @@ export default function GatePage() {
     async function handleQrToken(
         qrToken: string
         ) {
-        if (!token || !selectedEventId) {
-            return;
-        }
+          if (!token || !selectedEventId || validating) {
+              return;
+          }
 
         try {
             setValidating(true);
@@ -342,18 +346,14 @@ export default function GatePage() {
                 </div>
 
                 <button
-                    type="button"
-                    disabled={!selectedEventId}
-                    className="flex w-full items-center justify-center gap-3 border border-(--border) px-5 py-4 text-sm transition hover:border-(--accent-violet) hover:text-(--accent-violet) disabled:opacity-30"
+                  type="button"
+                  disabled={!selectedEventId}
+                  onClick={() => setScannerOpen(true)}
+                  className="flex w-full items-center justify-center gap-3 border border-(--border) px-5 py-4 text-sm transition hover:border-(--accent-violet) hover:text-(--accent-violet) disabled:opacity-30"
                 >
-                    <ScanLine size={19} />
-                    Ler QR Code
+                  <ScanLine size={19} />
+                  Ler QR Code
                 </button>
-
-                <p className="mt-4 text-xs leading-5 text-(--muted)">
-                    A leitura pela câmera será conectada na
-                    próxima parte desta etapa.
-                </p>
 
                 {error && (
                     <p className="mt-6 text-sm text-(--error)">
@@ -371,6 +371,17 @@ export default function GatePage() {
                 </section>
             </div>
             </Container>
+
+            {scannerOpen && (
+              <QrScanner
+                onClose={() => setScannerOpen(false)}
+                onScan={async (value) => {
+                  setScannerOpen(false);
+
+                  await handleQrToken(value);
+                }}
+              />
+            )}
         </main>
     );
 }
