@@ -8,6 +8,7 @@ import { loginRequest } from "@/services/auth";
 import { useAuth } from "@/components/providers/auth-provider";
 
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 export function LoginContent() {
   const router = useRouter();
@@ -72,12 +73,12 @@ export function LoginContent() {
       <div className="grid min-h-screen lg:grid-cols-2">
         <section className="flex flex-col justify-between border-b border-(--border) p-8 lg:border-b-0 lg:border-r">
           <div>
-            <span className="text-xl font-semibold tracking-[-0.04em]">
-              ELITE
-              <span className="text-(--accent-green)">
-                •
-              </span>
-            </span>
+            <Link
+            href="/"
+            className="text-xl font-semibold tracking-[-0.04em]"
+          >
+            ELITE TICKETS   <span className="text-(--accent-green) text-2xl">•</span>
+          </Link>
           </div>
 
           <div className="my-20 max-w-xl lg:my-0">
