@@ -159,8 +159,13 @@ export default function CheckoutPage() {
                         "elite_current_reservation"
                 );
 
+                 sessionStorage.setItem(
+                    "elite_payment_success",
+                    "true"
+                );
+
                 router.push(
-                    "/meus-ingressos?payment=success"
+                    "/meus-ingressos"
                 );
 
                 return;
