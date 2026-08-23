@@ -82,3 +82,41 @@ export async function publishEvent(
 
   return data;
 }
+
+type CreateEventInput = {
+  tmdbMovieId: number;
+  dateTime: string;
+  location: string;
+  room: string;
+  price: number;
+};
+
+export async function createEvent(
+  data: CreateEventInput,
+  token: string
+): Promise<Event> {
+  const response = await fetch(
+    `${API_URL}/events`,
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+
+      body: JSON.stringify(data),
+    }
+  );
+
+  const responseData = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      responseData.message ??
+        "Não foi possível criar a sessão"
+    );
+  }
+
+  return responseData;
+}

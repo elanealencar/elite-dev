@@ -56,3 +56,16 @@ a {
   background: var(--accent-green);
   color: #0d0d0d;
 }
+
+.form-input {
+  width: 100%;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  padding: 0.75rem 0;
+  outline: none;
+  transition: border-color 150ms ease;
+}
+
+.form-input:focus {
+  border-color: var(--accent-cyan);
+}

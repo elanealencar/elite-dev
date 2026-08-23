@@ -91,7 +91,7 @@ export default function OrganizerPage() {
         }
 
         loadEvents();
-        }, [
+    }, [
         authLoading,
         user,
         token,
