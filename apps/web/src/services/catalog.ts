@@ -3,11 +3,15 @@ import type { Movie } from "@/types/movie";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function searchMovies(
-  query: string
+  query: string,
+  token: string
 ): Promise<Movie[]> {
   const response = await fetch(
     `${API_URL}/catalog/movies?query=${encodeURIComponent(query)}`,
     {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
       cache: "no-store",
     }
   );

@@ -76,22 +76,30 @@ export default function NewEventPage() {
         const normalizedQuery = query.trim();
 
         if (normalizedQuery.length < 2) {
-            setError(
-            "Digite pelo menos 2 caracteres para buscar."
-            );
-            return;
+          setError(
+          "Digite pelo menos 2 caracteres para buscar."
+          );
+          return;
+        }
+
+         if (!token) {
+          setError(
+            "Sessão não encontrada. Faça login novamente."
+          );
+          return;
         }
 
         try {
-            setSearching(true);
-            setError("");
-            setSelectedMovie(null);
+          setSearching(true);
+          setError("");
+          setSelectedMovie(null);
 
-            const data = await searchMovies(
-            normalizedQuery
-            );
+          const data = await searchMovies(
+            normalizedQuery,
+            token
+          );
 
-            setMovies(data);
+          setMovies(data);
         } catch (error) {
             setError(
             error instanceof Error
@@ -138,21 +146,25 @@ export default function NewEventPage() {
         }
 
         try {
-            setCreating(true);
-            setError("");
+          setCreating(true);
+          setError("");
 
-            await createEvent(
+          const eventDate = new Date(
+            `${date}T${time}:00-03:00`
+          );
+
+          await createEvent(
             {
-                tmdbMovieId: selectedMovie.id,
-                dateTime: `${date}T${time}:00`,
-                location: location.trim(),
-                room: room.trim(),
-                price: numericPrice,
+              tmdbMovieId: selectedMovie.id,
+              dateTime: eventDate.toISOString(),
+              location: location.trim(),
+              room: room.trim(),
+              price: numericPrice,
             },
             token
-            );
+          );
 
-            router.push("/organizador");
+          router.push("/organizador");
         } catch (error) {
             setError(
             error instanceof Error
