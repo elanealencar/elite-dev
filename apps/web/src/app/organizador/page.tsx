@@ -17,6 +17,8 @@ import { useAuth } from "@/components/providers/auth-provider";
 import {
   getOrganizerEvents,
   publishEvent,
+  deleteEvent,
+  cancelEvent,
 } from "@/services/events";
 import type { Event } from "@/types/event";
 import {
@@ -39,6 +41,12 @@ export default function OrganizerPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [publishingId, setPublishingId] =
+    useState<string | null>(null);
+
+  const [deletingId, setDeletingId] =
+    useState<string | null>(null);
+
+  const [cancellingId, setCancellingId] =
     useState<string | null>(null);
 
   useEffect(() => {
@@ -148,6 +156,85 @@ export default function OrganizerPage() {
             );
         } finally {
             setPublishingId(null);
+        }
+    }
+
+    async function handleDelete(
+        eventId: string
+        ) {
+        if (!token) {
+            return;
+        }
+
+        const confirmed = window.confirm(
+            "Tem certeza que deseja excluir este rascunho?"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            setDeletingId(eventId);
+            setError("");
+
+            await deleteEvent(eventId, token);
+
+            setEvents((current) =>
+            current.filter(
+                (event) => event.id !== eventId
+            )
+            );
+        } catch (error) {
+            setError(
+            error instanceof Error
+                ? error.message
+                : "Não foi possível excluir a sessão"
+            );
+        } finally {
+            setDeletingId(null);
+        }
+    }
+
+    async function handleCancel(
+        eventId: string
+        ) {
+        if (!token) {
+            return;
+        }
+
+        const confirmed = window.confirm(
+            "Tem certeza que deseja cancelar esta sessão?"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            setCancellingId(eventId);
+            setError("");
+
+            const updated = await cancelEvent(
+            eventId,
+            token
+            );
+
+            setEvents((current) =>
+            current.map((event) =>
+                event.id === updated.id
+                ? updated
+                : event
+            )
+            );
+        } catch (error) {
+            setError(
+            error instanceof Error
+                ? error.message
+                : "Não foi possível cancelar a sessão"
+            );
+        } finally {
+            setCancellingId(null);
         }
     }
 
@@ -305,10 +392,22 @@ export default function OrganizerPage() {
                     event={event}
                     index={index}
                     publishing={
-                    publishingId === event.id
+                        publishingId === event.id
+                    }
+                    deleting={
+                        deletingId === event.id
+                    }
+                    cancelling={
+                        cancellingId === event.id
                     }
                     onPublish={() =>
-                    handlePublish(event.id)
+                        handlePublish(event.id)
+                    }
+                    onDelete={() =>
+                        handleDelete(event.id)
+                    }
+                    onCancel={() =>
+                        handleCancel(event.id)
                     }
                 />
                 ))}
@@ -351,13 +450,21 @@ type OrganizerEventRowProps = {
     index: number;
     publishing: boolean;
     onPublish: () => void;
+    deleting: boolean;
+    cancelling: boolean;
+    onDelete: () => void;
+    onCancel: () => void;
 };
 
 function OrganizerEventRow({
-    event,
-    index,
-    publishing,
-    onPublish,
+  event,
+  index,
+  publishing,
+  deleting,
+  cancelling,
+  onPublish,
+  onDelete,
+  onCancel,
 }: OrganizerEventRowProps) {
     const status =
         event.status === "PUBLISHED"
@@ -376,7 +483,7 @@ function OrganizerEventRow({
         };
 
     return (
-        <article className="grid gap-6 border-b border-(--border) py-7 md:grid-cols-[60px_1.4fr_1fr_140px] md:items-center">
+        <article className="grid gap-6 border-b border-(--border) py-7 md:grid-cols-[60px_1.4fr_1fr_200px] md:items-center">
             <span className="text-xs text-(--muted)">
                 {String(index + 1).padStart(
                 2,
@@ -432,24 +539,52 @@ function OrganizerEventRow({
                 </div>
             </div>
 
-            <div className="flex md:justify-end">
-                {event.status === "DRAFT" ? (
-                <button
-                    type="button"
-                    disabled={publishing}
-                    onClick={onPublish}
-                    className="border-b border-(--accent-green) pb-1 text-sm text-(--accent-green) transition-opacity hover:opacity-60 disabled:cursor-not-allowed disabled:opacity-30"
-                >
-                    {publishing
-                    ? "Publicando..."
-                    : "Publicar →"}
-                </button>
-                ) : (
-                <span className="text-xs text-(--muted)">
-                    —
-                </span>
+            <div className="flex flex-wrap gap-4 md:justify-end">
+                {event.status === "DRAFT" && (
+                    <>
+                    <button
+                        type="button"
+                        disabled={deleting || publishing}
+                        onClick={onDelete}
+                        className="border-b border-(--error) pb-1 text-sm text-(--error) transition-opacity hover:opacity-60 disabled:cursor-not-allowed disabled:opacity-30"
+                    >
+                        {deleting
+                        ? "Excluindo..."
+                        : "Excluir"}
+                    </button>
+
+                    <button
+                        type="button"
+                        disabled={publishing || deleting}
+                        onClick={onPublish}
+                        className="border-b border-(--accent-green) pb-1 text-sm text-(--accent-green) transition-opacity hover:opacity-60 disabled:cursor-not-allowed disabled:opacity-30"
+                    >
+                        {publishing
+                        ? "Publicando..."
+                        : "Publicar →"}
+                    </button>
+                    </>
                 )}
-            </div>
+
+                {event.status === "PUBLISHED" && (
+                    <button
+                    type="button"
+                    disabled={cancelling}
+                    onClick={onCancel}
+                    className="border-b border-(--warning) pb-1 text-sm text-(--warning) transition-opacity hover:opacity-60 disabled:cursor-not-allowed disabled:opacity-30"
+                    >
+                    {cancelling
+                        ? "Cancelando..."
+                        : "Cancelar sessão"}
+                    </button>
+                )}
+
+                {event.status === "CANCELLED" && (
+                    <span className="text-xs text-(--muted)">
+                    Histórico
+                    </span>
+                )}
+                </div>
         </article>
     );
 }

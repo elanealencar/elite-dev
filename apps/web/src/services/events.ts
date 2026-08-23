@@ -120,3 +120,56 @@ export async function createEvent(
 
   return responseData;
 }
+
+export async function deleteEvent(
+  eventId: string,
+  token: string
+): Promise<void> {
+  const response = await fetch(
+    `${API_URL}/events/${eventId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    let message =
+      "Não foi possível excluir a sessão";
+
+    try {
+      const data = await response.json();
+      message = data.message ?? message;
+    } catch {}
+
+    throw new Error(message);
+  }
+}
+
+export async function cancelEvent(
+  eventId: string,
+  token: string
+): Promise<Event> {
+  const response = await fetch(
+    `${API_URL}/events/${eventId}/cancel`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.message ??
+        "Não foi possível cancelar a sessão"
+    );
+  }
+
+  return data;
+}
