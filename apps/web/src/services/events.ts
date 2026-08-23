@@ -31,3 +31,54 @@ export async function getEventById(
 
   return response.json();
 }
+
+export async function getOrganizerEvents(
+  token: string
+): Promise<Event[]> {
+  const response = await fetch(
+    `${API_URL}/events/organizer/me`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.message ??
+        "Não foi possível carregar seus eventos"
+    );
+  }
+
+  return data;
+}
+
+export async function publishEvent(
+  eventId: string,
+  token: string
+): Promise<Event> {
+  const response = await fetch(
+    `${API_URL}/events/${eventId}/publish`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.message ??
+        "Não foi possível publicar o evento"
+    );
+  }
+
+  return data;
+}
