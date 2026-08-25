@@ -26,7 +26,7 @@ export function Header() {
 
           <nav className="hidden items-center gap-8 text-sm font-medium md:flex">
             <Link
-              href="/"
+              href="/#em-cartaz"
               className="hover:text-(--accent-green)"
             >
               FILMES
