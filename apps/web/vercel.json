@@ -2,5 +2,5 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "buildCommand": "npm run build",
-  "installCommand": "npm ci && npm install --no-save lightningcss-linux-x64-gnu"
+  "installCommand": "npm ci && npm install --no-save lightningcss-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu"
 }
