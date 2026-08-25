@@ -26,6 +26,17 @@ https://elite-dev-web.vercel.app/
 
 https://elite-dev-api-mu.vercel.app/
 
+## 🔑 Acesso de demonstração
+
+Para facilitar a avaliação dos diferentes fluxos da aplicação, o ambiente de demonstração possui usuários específicos para cada perfil.
+
+| Perfil | E-mail | Senha |
+|---|---|---|
+| Customer | `customer1@elite.dev` | `Elite@123` |
+| Organizer | `organizer@elite.dev` | `Elite@123` |
+| Gate | `gate@elite.dev` | `Elite@123` |
+
+As credenciais acima pertencem exclusivamente ao ambiente de demonstração e não são utilizadas em outros serviços.
 
 # ✨ Visão geral
 
